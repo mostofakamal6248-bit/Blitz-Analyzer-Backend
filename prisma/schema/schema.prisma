@@ -1,0 +1,47 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum UserRole {
+  USER
+  ADMIN
+  
+  
+}
+enum AnalysisType {
+  ATS_SCAN
+  JOB_MATCHER
+  
+  
+}
+enum UserStatus {
+  ACTIVE
+  BANNED
+  DELETED
+}
+
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentMethod {
+  STRIPE
+  SSLCOMMERZ
+  PAYPAL
+}
+enum CreditType {
+  PURCHASE
+  USAGE
+  REFUND
+  ADMIN_ADJUST
+}

@@ -1,0 +1,15 @@
+model Resume {
+  id        String   @id @default(uuid())
+  userId    String
+  user CustomerProfile @relation(fields: [userId],references: [id])
+  name      String @default(uuid())
+  isEdit Boolean @default(false)
+  resumeUrl String?
+  templateId String 
+  template Template @relation(fields: [templateId],references: [id])
+  resumeData Json
+  createdAt DateTime @default(now())
+  resumeHtml String
+  @@map("resumes")
+
+}
