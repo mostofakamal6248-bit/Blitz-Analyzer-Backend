@@ -42,18 +42,34 @@ export const handleStripeWebhookController = asyncHandler(async (req, res) => {
   }
 
   switch (event.type) {
+
+   case "payment_intent.succeeded" :{
+     console.log("receivve payment_intent complete");
+
+            if (session.payment_status !== "paid") break;
+console.log("payment start");
+
+      const { payment } = await paymentServices.handleStripePaymentSuccess(paymentId);
+      console.log("payemnt done");
+    }
+
     case "checkout.session.completed": {
-    
+     console.log("receivve checkout session complete");
+     
       if (session.payment_status !== "paid") break;
-console.log("payment tstart");
+console.log("payment start");
 
       const { payment } = await paymentServices.handleStripePaymentSuccess(paymentId);
       console.log("payemnt done");
       break;
     }
 
+ 
+
     case "checkout.session.expired":
     case "payment_intent.payment_failed": {
+      console.warn(`Payment ${paymentId} failed or expired`);
+
       await prisma.payment.update({
         where: { id: paymentId },
         data: { status: "FAILED" },

@@ -154,8 +154,8 @@ const createCreditPurchaseSession = async (
     ],
     mode: "payment",
     customer_email: customer.email, // optional: fetch user email if available
-    success_url: `${successUrl}?paymentId=${payment.id}`,
-    cancel_url: `${cancelUrl}?paymentId=${payment.id}`,
+    success_url: `${successUrl}/${payment.id}`,
+    cancel_url: `${cancelUrl}/${payment.id}`,
     metadata: {
       paymentId: payment.id,
       userId,
