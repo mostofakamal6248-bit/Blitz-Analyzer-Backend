@@ -411,9 +411,9 @@ export type TemplateUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type TemplateScalarRelationFilter = {
-  is?: Prisma.TemplateWhereInput
-  isNot?: Prisma.TemplateWhereInput
+export type TemplateNullableScalarRelationFilter = {
+  is?: Prisma.TemplateWhereInput | null
+  isNot?: Prisma.TemplateWhereInput | null
 }
 
 export type TemplateCountOrderByAggregateInput = {
@@ -465,10 +465,12 @@ export type TemplateCreateNestedOneWithoutResumeInput = {
   connect?: Prisma.TemplateWhereUniqueInput
 }
 
-export type TemplateUpdateOneRequiredWithoutResumeNestedInput = {
+export type TemplateUpdateOneWithoutResumeNestedInput = {
   create?: Prisma.XOR<Prisma.TemplateCreateWithoutResumeInput, Prisma.TemplateUncheckedCreateWithoutResumeInput>
   connectOrCreate?: Prisma.TemplateCreateOrConnectWithoutResumeInput
   upsert?: Prisma.TemplateUpsertWithoutResumeInput
+  disconnect?: Prisma.TemplateWhereInput | boolean
+  delete?: Prisma.TemplateWhereInput | boolean
   connect?: Prisma.TemplateWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TemplateUpdateToOneWithWhereWithoutResumeInput, Prisma.TemplateUpdateWithoutResumeInput>, Prisma.TemplateUncheckedUpdateWithoutResumeInput>
 }

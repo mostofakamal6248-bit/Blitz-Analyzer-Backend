@@ -34,6 +34,17 @@ resumeRouter.post(
   //add validation
   resumeControllers.generateResumeForDownload
 );
+resumeRouter.post(
+  "/:id/generate-custom-download",
+  authMiddleware,
+  roleMiddleware(["USER"]),
+  //add validation
+  resumeControllers.generateCustomResumeForDownload
+);
+
+
+
+
 resumeRouter.get(
   "/",
   authMiddleware,

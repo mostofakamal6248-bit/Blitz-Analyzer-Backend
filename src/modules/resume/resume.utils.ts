@@ -2,6 +2,7 @@ import Handlebars from "handlebars";
 import puppeteer from "puppeteer";
 import { uploadPdfBufferToCloudinary } from "../media/media.service";
 import { AppError } from "../../utils/AppError";
+import { cloudinaryInstance } from "../../config/cloudinary.config";
 
 export const mergeResume = ({templateString,resumeData}:{resumeData:any,templateString:string})=>{
 const template = Handlebars.compile(templateString);
@@ -22,9 +23,6 @@ const browser = await puppeteer.launch({
     const page = await browser.newPage();
     // Set HTML content
     await page.setContent(html, { waitUntil: "networkidle0" });
-    // Optional: Add custom CSS for Tailwind or template
-    // await page.addStyleTag({ path: "path/to/tailwind.css" });
-    // Generate PDF
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
@@ -51,11 +49,83 @@ export const uploadResume = async (resumeBuffer:Uint8Array<ArrayBufferLike> | an
     public_id:filename,
     resource_type:"row"
    })
-// const secure_url = "https://collection.cloudinary.com/drngnsgwy/240f440bd6d672875f4285acc7e61f0e"
    if(!secure_url){
     throw new AppError(`failed to upload ${filename} in cloudinary`,400)
    }
    console.log("end uploading",secure_url);
    
     return secure_url
+}
+export async function generateCustomResumePDF(htmlContent: any) {
+  const finalHtmlContent = `
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact;
+      }
+      svg {
+        display: inline-block;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+      ${htmlContent}
+  </body>
+</html>
+`;
+  try {
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    const page = await browser.newPage();
+    await page.setContent(finalHtmlContent, { 
+      waitUntil: ['networkidle0', 'domcontentloaded'] 
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
+    });
+    await browser.close();
+    return pdfBuffer;
+  } catch (error) {
+    console.error("PDF Export Error:", error);
+    return null;
+  }
+}
+
+
+
+export async function uploadCustomResumepdf (pdfBuffer,userId) {
+  
+    try {
+        return new Promise((resolve, reject) => {
+            const uploadStream = cloudinaryInstance.uploader.upload_stream(
+                {
+                  folder: "blitz-analyzer/resumes",
+  resource_type: "raw",       
+  type: "upload",              
+  access_mode: "public",   
+  format: "pdf",
+  flags: "attachment"
+                },
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result); 
+                }
+            );
+            uploadStream.end(pdfBuffer);
+        });
+
+    } catch (err) {
+       throw new AppError("Failed to upload Custom Resume pdf",400)
+    }
 }

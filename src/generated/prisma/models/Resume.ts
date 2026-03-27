@@ -173,7 +173,7 @@ export type ResumeGroupByOutputType = {
   name: string
   isEdit: boolean
   resumeUrl: string | null
-  templateId: string
+  templateId: string | null
   resumeData: runtime.JsonValue
   createdAt: Date
   resumeHtml: string
@@ -206,12 +206,12 @@ export type ResumeWhereInput = {
   name?: Prisma.StringFilter<"Resume"> | string
   isEdit?: Prisma.BoolFilter<"Resume"> | boolean
   resumeUrl?: Prisma.StringNullableFilter<"Resume"> | string | null
-  templateId?: Prisma.StringFilter<"Resume"> | string
+  templateId?: Prisma.StringNullableFilter<"Resume"> | string | null
   resumeData?: Prisma.JsonFilter<"Resume">
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   resumeHtml?: Prisma.StringFilter<"Resume"> | string
   user?: Prisma.XOR<Prisma.CustomerProfileScalarRelationFilter, Prisma.CustomerProfileWhereInput>
-  template?: Prisma.XOR<Prisma.TemplateScalarRelationFilter, Prisma.TemplateWhereInput>
+  template?: Prisma.XOR<Prisma.TemplateNullableScalarRelationFilter, Prisma.TemplateWhereInput> | null
 }
 
 export type ResumeOrderByWithRelationInput = {
@@ -220,7 +220,7 @@ export type ResumeOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   isEdit?: Prisma.SortOrder
   resumeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  templateId?: Prisma.SortOrder
+  templateId?: Prisma.SortOrderInput | Prisma.SortOrder
   resumeData?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resumeHtml?: Prisma.SortOrder
@@ -237,12 +237,12 @@ export type ResumeWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Resume"> | string
   isEdit?: Prisma.BoolFilter<"Resume"> | boolean
   resumeUrl?: Prisma.StringNullableFilter<"Resume"> | string | null
-  templateId?: Prisma.StringFilter<"Resume"> | string
+  templateId?: Prisma.StringNullableFilter<"Resume"> | string | null
   resumeData?: Prisma.JsonFilter<"Resume">
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   resumeHtml?: Prisma.StringFilter<"Resume"> | string
   user?: Prisma.XOR<Prisma.CustomerProfileScalarRelationFilter, Prisma.CustomerProfileWhereInput>
-  template?: Prisma.XOR<Prisma.TemplateScalarRelationFilter, Prisma.TemplateWhereInput>
+  template?: Prisma.XOR<Prisma.TemplateNullableScalarRelationFilter, Prisma.TemplateWhereInput> | null
 }, "id">
 
 export type ResumeOrderByWithAggregationInput = {
@@ -251,7 +251,7 @@ export type ResumeOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   isEdit?: Prisma.SortOrder
   resumeUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  templateId?: Prisma.SortOrder
+  templateId?: Prisma.SortOrderInput | Prisma.SortOrder
   resumeData?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resumeHtml?: Prisma.SortOrder
@@ -269,7 +269,7 @@ export type ResumeScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Resume"> | string
   isEdit?: Prisma.BoolWithAggregatesFilter<"Resume"> | boolean
   resumeUrl?: Prisma.StringNullableWithAggregatesFilter<"Resume"> | string | null
-  templateId?: Prisma.StringWithAggregatesFilter<"Resume"> | string
+  templateId?: Prisma.StringNullableWithAggregatesFilter<"Resume"> | string | null
   resumeData?: Prisma.JsonWithAggregatesFilter<"Resume">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Resume"> | Date | string
   resumeHtml?: Prisma.StringWithAggregatesFilter<"Resume"> | string
@@ -284,7 +284,7 @@ export type ResumeCreateInput = {
   createdAt?: Date | string
   resumeHtml: string
   user: Prisma.CustomerProfileCreateNestedOneWithoutSavedResumesInput
-  template: Prisma.TemplateCreateNestedOneWithoutResumeInput
+  template?: Prisma.TemplateCreateNestedOneWithoutResumeInput
 }
 
 export type ResumeUncheckedCreateInput = {
@@ -293,7 +293,7 @@ export type ResumeUncheckedCreateInput = {
   name?: string
   isEdit?: boolean
   resumeUrl?: string | null
-  templateId: string
+  templateId?: string | null
   resumeData: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   resumeHtml: string
@@ -308,7 +308,7 @@ export type ResumeUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.CustomerProfileUpdateOneRequiredWithoutSavedResumesNestedInput
-  template?: Prisma.TemplateUpdateOneRequiredWithoutResumeNestedInput
+  template?: Prisma.TemplateUpdateOneWithoutResumeNestedInput
 }
 
 export type ResumeUncheckedUpdateInput = {
@@ -317,7 +317,7 @@ export type ResumeUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isEdit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  templateId?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeData?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
@@ -329,7 +329,7 @@ export type ResumeCreateManyInput = {
   name?: string
   isEdit?: boolean
   resumeUrl?: string | null
-  templateId: string
+  templateId?: string | null
   resumeData: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   resumeHtml: string
@@ -351,7 +351,7 @@ export type ResumeUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isEdit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  templateId?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeData?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
@@ -493,7 +493,7 @@ export type ResumeCreateWithoutUserInput = {
   resumeData: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   resumeHtml: string
-  template: Prisma.TemplateCreateNestedOneWithoutResumeInput
+  template?: Prisma.TemplateCreateNestedOneWithoutResumeInput
 }
 
 export type ResumeUncheckedCreateWithoutUserInput = {
@@ -501,7 +501,7 @@ export type ResumeUncheckedCreateWithoutUserInput = {
   name?: string
   isEdit?: boolean
   resumeUrl?: string | null
-  templateId: string
+  templateId?: string | null
   resumeData: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   resumeHtml: string
@@ -542,7 +542,7 @@ export type ResumeScalarWhereInput = {
   name?: Prisma.StringFilter<"Resume"> | string
   isEdit?: Prisma.BoolFilter<"Resume"> | boolean
   resumeUrl?: Prisma.StringNullableFilter<"Resume"> | string | null
-  templateId?: Prisma.StringFilter<"Resume"> | string
+  templateId?: Prisma.StringNullableFilter<"Resume"> | string | null
   resumeData?: Prisma.JsonFilter<"Resume">
   createdAt?: Prisma.DateTimeFilter<"Resume"> | Date | string
   resumeHtml?: Prisma.StringFilter<"Resume"> | string
@@ -601,7 +601,7 @@ export type ResumeCreateManyUserInput = {
   name?: string
   isEdit?: boolean
   resumeUrl?: string | null
-  templateId: string
+  templateId?: string | null
   resumeData: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   resumeHtml: string
@@ -615,7 +615,7 @@ export type ResumeUpdateWithoutUserInput = {
   resumeData?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
-  template?: Prisma.TemplateUpdateOneRequiredWithoutResumeNestedInput
+  template?: Prisma.TemplateUpdateOneWithoutResumeNestedInput
 }
 
 export type ResumeUncheckedUpdateWithoutUserInput = {
@@ -623,7 +623,7 @@ export type ResumeUncheckedUpdateWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isEdit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  templateId?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeData?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
@@ -634,7 +634,7 @@ export type ResumeUncheckedUpdateManyWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   isEdit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   resumeUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  templateId?: Prisma.StringFieldUpdateOperationsInput | string
+  templateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resumeData?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resumeHtml?: Prisma.StringFieldUpdateOperationsInput | string
@@ -697,7 +697,7 @@ export type ResumeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   createdAt?: boolean
   resumeHtml?: boolean
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }, ExtArgs["result"]["resume"]>
 
 export type ResumeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -711,7 +711,7 @@ export type ResumeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   createdAt?: boolean
   resumeHtml?: boolean
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }, ExtArgs["result"]["resume"]>
 
 export type ResumeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -725,7 +725,7 @@ export type ResumeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   createdAt?: boolean
   resumeHtml?: boolean
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }, ExtArgs["result"]["resume"]>
 
 export type ResumeSelectScalar = {
@@ -743,22 +743,22 @@ export type ResumeSelectScalar = {
 export type ResumeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "isEdit" | "resumeUrl" | "templateId" | "resumeData" | "createdAt" | "resumeHtml", ExtArgs["result"]["resume"]>
 export type ResumeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }
 export type ResumeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }
 export type ResumeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.CustomerProfileDefaultArgs<ExtArgs>
-  template?: boolean | Prisma.TemplateDefaultArgs<ExtArgs>
+  template?: boolean | Prisma.Resume$templateArgs<ExtArgs>
 }
 
 export type $ResumePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Resume"
   objects: {
     user: Prisma.$CustomerProfilePayload<ExtArgs>
-    template: Prisma.$TemplatePayload<ExtArgs>
+    template: Prisma.$TemplatePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -766,7 +766,7 @@ export type $ResumePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: string
     isEdit: boolean
     resumeUrl: string | null
-    templateId: string
+    templateId: string | null
     resumeData: runtime.JsonValue
     createdAt: Date
     resumeHtml: string
@@ -1165,7 +1165,7 @@ readonly fields: ResumeFieldRefs;
 export interface Prisma__ResumeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.CustomerProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__CustomerProfileClient<runtime.Types.Result.GetResult<Prisma.$CustomerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  template<T extends Prisma.TemplateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TemplateDefaultArgs<ExtArgs>>): Prisma.Prisma__TemplateClient<runtime.Types.Result.GetResult<Prisma.$TemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  template<T extends Prisma.Resume$templateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Resume$templateArgs<ExtArgs>>): Prisma.Prisma__TemplateClient<runtime.Types.Result.GetResult<Prisma.$TemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1602,6 +1602,25 @@ export type ResumeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Resumes to delete.
    */
   limit?: number
+}
+
+/**
+ * Resume.template
+ */
+export type Resume$templateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Template
+   */
+  select?: Prisma.TemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Template
+   */
+  omit?: Prisma.TemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TemplateInclude<ExtArgs> | null
+  where?: Prisma.TemplateWhereInput
 }
 
 /**

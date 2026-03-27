@@ -2,7 +2,7 @@
 import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { generateResumePDF, mergeResume, uploadResume } from "./resume.utils";
+import { generateCustomResumePDF, generateResumePDF, mergeResume, uploadCustomResumepdf, uploadResume } from "./resume.utils";
 import { cloudinaryInstance } from "../../config/cloudinary.config";
 import streamifier from "streamifier"; 
 
@@ -23,15 +23,6 @@ const generateResumeForDownload = async (
    if (resume.userId !== userId) {
       throw new AppError("Unauthorized", status.UNAUTHORIZED);
    }
-
-   // ✅ already generated & not edited
-   // if (resume.resumeUrl && !resume.isEdit) {
-   //    return {
-   //       resumeUrl: resume.resumeUrl,
-   //       reused: true
-   //    };
-   // }
-
    // ✅ check credit
    const wallet = await prisma.creditWallet.findUnique({
       where: { userId }
@@ -193,4 +184,13 @@ const deleteResume = async (resumeId:string) =>{
 
    return resumes
 }
-export const resumeServices = { generateResumeForDownload, initResume, saveChanges,getAllResumeById,deleteResume }
+
+
+const generateCustomResumeForDownload = async (htmlContent,resumeData,userId)=>{
+     const pdfBuffer = await generateCustomResumePDF(htmlContent);
+     const uploadPDF = await uploadCustomResumepdf(pdfBuffer,userId);
+     return uploadPDF
+   
+}
+
+export const resumeServices = { generateResumeForDownload, initResume, saveChanges,getAllResumeById,deleteResume,generateCustomResumeForDownload }

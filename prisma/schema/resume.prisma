@@ -5,8 +5,8 @@ model Resume {
   name      String @default(uuid())
   isEdit Boolean @default(false)
   resumeUrl String?
-  templateId String 
-  template Template @relation(fields: [templateId],references: [id])
+  templateId String? 
+  template Template? @relation(fields: [templateId],references: [id])
   resumeData Json
   createdAt DateTime @default(now())
   resumeHtml String
