@@ -29,6 +29,7 @@ const generateOTP = (length = 6) => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+const getProfileCacheKey = (userId: string, role: string) => `profile:${userId}-${role}`;
 
 
 const registerUser = async (payload: IRegisterPayload) => {
@@ -178,7 +179,7 @@ const getAllNewTokens = async (
 };
 
 const getCustomerProfile = async (user: IRequestUser) => {
-  const cacheKey = `profile:${user.userId}-${user.role}`;
+  const cacheKey = getProfileCacheKey(user.userId,user.role)
 
   const cached = await redis.get(cacheKey);
   if (cached) return JSON.parse(cached);
@@ -367,95 +368,90 @@ console.log(isMatch,otp,record.value);
 };
 
 
-const changeAvatar = async (profileAvatarUrl: string, userId: string) => {
-  const result = await prisma.$transaction(async (tx) => {
+const updateProfile = async (updatedData: any, userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { admin: true, customerProfile: true }
+  });
 
-    const user = await tx.user.update({
-      where: { id: userId },
-      data: {
-        image: profileAvatarUrl
-      }
-    });
+  if (!user) throw new AppError("User not found", status.NOT_FOUND);
 
-    const isAdmin = user.role === "ADMIN" ? true : false;
+  const isAdmin = user.role === "ADMIN";
+  let updatedProfile;
 
-
-    if (isAdmin) {
-      await tx.admin.update({
+  if (isAdmin) {
+    updatedProfile = await prisma.$transaction(async (ts) => {
+      await ts.user.update({
+        where: { id: userId },
+        data: { name: updatedData.name || user.name }
+      });
+      return await ts.admin.update({
         where: { userId: userId },
         data: {
-          profileAvatar: profileAvatarUrl,
-        }
-      })
+          name: updatedData.name || user.admin?.name,
+          loaction: updatedData.location || user.admin?.loaction,
+          contactNumber: updatedData.contactNumber || user.admin?.contactNumber,
+        },
+        include: { user: true }
+      });
+    });
+  } else {
+    updatedProfile = await prisma.$transaction(async (ts) => {
+      await ts.user.update({
+        where: { id: userId },
+        data: { name: updatedData.name || user.name }
+      });
+      return await ts.customerProfile.update({
+        where: { userId: userId },
+        data: {
+          name: updatedData.name || user.customerProfile?.name,
+          location: updatedData.location || user.customerProfile?.location,
+          contactNumber: updatedData.contactNumber || user.customerProfile?.contactNumber,
+          experienceLevel: updatedData.experienceLevel || user.customerProfile?.experienceLevel,
+          profession: updatedData.profession || user.customerProfile?.profession,
+        },
+        include: { user: true, analysisHistory: true, wallet: true }
+      });
+    });
+  }
+
+  // 🔥 CRITICAL FIX: Invalidate Cache after update
+  const cacheKey = getProfileCacheKey(userId, user.role);
+  await redis.del(cacheKey);
+
+  return updatedProfile;
+};
+
+
+const changeAvatar = async (profileAvatarUrl: string, userId: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { id: userId },
+      data: { image: profileAvatarUrl }
+    });
+
+    if (user.role === "ADMIN") {
+      await tx.admin.update({
+        where: { userId: userId },
+        data: { profileAvatar: profileAvatarUrl }
+      });
     } else {
       await tx.customerProfile.update({
         where: { userId: userId },
-        data: {
-          profileAvatar: profileAvatarUrl,
-        }
-      })
-
+        data: { profileAvatar: profileAvatarUrl }
+      });
     }
+    return user;
+  });
 
-
-    return user
-
-  })
+  // 🔥 CRITICAL FIX: Invalidate Cache
+  const cacheKey = getProfileCacheKey(userId, result.role);
+  await redis.del(cacheKey);
+console.log("avater chnages");
 
   return result;
-}
-const updateProfile = async (updatedData: any, userId: string) => {
+};
 
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      admin: { include: { user: true } }, customerProfile: {
-        include: { user: true }
-      }
-    }
-  });
-  const isAdmin = user?.role === "ADMIN" ? true : false;
-
-  if (isAdmin) {
-    await prisma.$transaction(async (ts) => {
-      await ts.user.update({
-        where: { id: user?.id! },
-        data: {
-          name: updatedData.name || user?.name,
-        }
-      })
-      await ts.admin.update({
-        where: { userId: user?.id! },
-        data: {
-          name: updatedData.name || user?.admin?.name,
-          loaction: updatedData.location || user?.admin?.loaction,
-          contactNumber: updatedData.contactNumber || user?.admin?.contactNumber,
-        }
-      })
-    })
-  } else {
-        await prisma.user.update({
-        where: { id: user?.id! },
-        data: {
-          name: updatedData.name || user?.name,
-        }
-      })
-    await prisma.customerProfile.update({
-      where: { userId: user?.id! },
-      data: {
-        name: updatedData.name || user?.customerProfile?.name,
-        location: updatedData.location || user?.customerProfile?.location,
-        contactNumber: updatedData.contactNumber || user?.customerProfile?.contactNumber,
-        experienceLevel: updatedData.experienceLevel || user?.customerProfile?.experienceLevel,
-        profession: updatedData.profession || user?.customerProfile?.profession,
-      }
-    })
-
-  }
-
-  return user?.role === "USER" ? user?.customerProfile : user?.admin
-}
 
 
 

@@ -192,6 +192,8 @@ const changeProfileAvatar = asyncHandler(async (req, res) => {
         console.log(payload);
         
         const updatedResult = await authServices.changeAvatar(payload.profileAvatarUrl,payload.userId)
+        console.log("chnage both");
+        
         return sendSuccess(res,{
           data:updatedResult,
           message:"Your Profile Avatar Change Successfully"
