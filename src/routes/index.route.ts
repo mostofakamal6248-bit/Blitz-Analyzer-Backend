@@ -9,6 +9,7 @@ import walletRouter from "../modules/wallet/wallet.route";
 import mediaRouter from "../modules/media/media.route";
 import { adminRoutes } from "../modules/admin/admin.route";
 import { userRouter } from "../modules/user/user.route";
+import { reviewRoutes } from "../modules/reviews/review.route";
 
 const indexRouter = Router();
 indexRouter.use("/auth",authRouter)
@@ -21,6 +22,7 @@ indexRouter.use("/wallet",walletRouter)
 indexRouter.use("/upload-media",mediaRouter)
 indexRouter.use("/admin",adminRoutes)
 indexRouter.use("/user",userRouter)
+indexRouter.use("/review",reviewRoutes)
 
 
 

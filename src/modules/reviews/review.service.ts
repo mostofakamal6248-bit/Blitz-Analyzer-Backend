@@ -53,7 +53,10 @@ const getAllReviews = async (query: any) => {
       }
     }),
     prisma.review.count()
-  ])
+  ]);
+
+
+
 
   return {
     meta: {
