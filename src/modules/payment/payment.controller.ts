@@ -66,8 +66,12 @@ console.log(userId);
 // ✅ Stripe webhook: mark payment complete
 export const stripeWebhook = asyncHandler(async (req: Request, res: Response) => {
   const { paymentId } = stripeWebhookSchema.parse(req.body) as StripeWebhookInput;
+console.log(`received webhook paymentId=${paymentId}`);
 
   const result = await paymentServices.handleStripePaymentSuccess(paymentId);
+console.log("payment done",paymentId);
+console.log(result);
+
 
   return sendSuccess(res, {
     message: "Payment processed successfully",

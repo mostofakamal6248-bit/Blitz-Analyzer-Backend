@@ -38,6 +38,7 @@ const handleStripePaymentSuccess = async (paymentId: string) => {
   });
 
   const invoiceResult  = await generateAndSendInvoice(result.payment);
+console.log(invoiceResult);
 
   return {result,invoiceResult}
 };
