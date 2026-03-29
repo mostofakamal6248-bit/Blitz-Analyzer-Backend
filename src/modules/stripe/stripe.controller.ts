@@ -5,64 +5,109 @@ import { sendError, sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import status from "http-status";
 import { AppError } from "../../utils/AppError";
-import { paymentServices } from "../payment/payment.service"
+import { paymentServices } from "../payment/payment.service";
 import { prisma } from "../../lib/prisma";
 
 export const handleStripeWebhookController = asyncHandler(async (req, res) => {
-  console.log("receive webhook");
+  console.log("🔥 Webhook received");
 
   const endpointSecret = envConfig.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
 
   try {
-    const signature = req.headers["stripe-signature"];
+    const signature = req.headers["stripe-signature"] as string;
+
     if (!signature || !endpointSecret) {
       throw new AppError("Missing Stripe signature or webhook secret", status.BAD_REQUEST);
     }
 
-    event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
+    //  raw buffer
+    console.log("Is Buffer:", Buffer.isBuffer(req.body));
 
+    event = stripe.webhooks.constructEvent(
+      req.body, //raw body
+      signature,
+      endpointSecret
+    );
 
   } catch (err: any) {
-    console.log("error", err);
-
-    throw new AppError("stripe failed to data parse", status.BAD_REQUEST);
-
+    console.error("❌ Stripe Webhook Error:", err.message);
+    console.error(err);
+    throw new AppError(`Webhook Error: ${err.message}`, status.BAD_REQUEST);
   }
 
-  const session = (event.data.object as any) || {};
+  try {
+    switch (event.type) {
 
-  const userId = session.metadata?.userId;
-  const paymentId = session.metadata?.paymentId;
 
-  if (!userId || !paymentId) {
-    return sendError(res, { statusCode: 400, message: "Missing userId or paymentId in session metadata" });
-  }
+      case "checkout.session.completed": {
+        console.log("✅ checkout.session.completed received");
 
-  switch (event.type) {
+        const session = event.data.object as Stripe.Checkout.Session;
 
-    case "checkout.session.completed": {
-      console.log("receive payment_intent complete");
-      if (session.payment_status !== "paid") break;
-      console.log("payment processing start");
-      await paymentServices.handleStripePaymentSuccess(paymentId);
-      console.log("payemnt processinng done");
-      break;
+        if (session.status !== "complete") {
+          console.log("⚠️ Session not complete, skipping");
+          break;
+        }
+
+        //Get PaymentIntent
+        const paymentIntentId = session.payment_intent as string;
+
+        if (!paymentIntentId) {
+          throw new AppError("Missing payment_intent in session", 400);
+        }
+
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+        const userId = paymentIntent.metadata?.userId;
+        const paymentId = paymentIntent.metadata?.paymentId;
+
+        if (!userId || !paymentId) {
+          console.warn("❌ Missing metadata in paymentIntent");
+          return sendError(res, {
+            statusCode: 400,
+            message: "Missing userId or paymentId in metadata",
+          });
+        }
+
+        console.log("💰 Processing payment:", paymentId);
+
+        await paymentServices.handleStripePaymentSuccess(paymentId);
+
+        console.log("✅ Payment processed successfully");
+        break;
+      }
+
+      // ❌ Payment failed
+      case "payment_intent.payment_failed": {
+        console.log("❌ payment_intent.payment_failed");
+
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+
+        const paymentId = paymentIntent.metadata?.paymentId;
+
+        if (!paymentId) {
+          console.warn("Missing paymentId in failed payment");
+          break;
+        }
+
+        await prisma.payment.update({
+          where: { id: paymentId },
+          data: { status: "FAILED" },
+        });
+
+        console.log(`❌ Payment ${paymentId} marked as FAILED`);
+        break;
+      }
+      default:
+        console.log(`ℹ️ Unhandled event type: ${event.type}`);
     }
-    case "payment_intent.payment_failed": {
-      console.warn(`Payment ${paymentId} failed or expired`);
-
-      await prisma.payment.update({
-        where: { id: paymentId },
-        data: { status: "FAILED" },
-      });
-      console.warn(`Payment ${paymentId} failed or expired`);
-      break;
-    }
-
-    default:
-      console.log(`Unhandled Stripe event type: ${event.type}`);
+  } catch (err: any) {
+    console.error("❌ Webhook processing error:", err);
+    throw new AppError(err.message || "Webhook processing failed", 500);
   }
 
-  return sendSuccess(res, { message: `Stripe webhook event ${event.id} processed successfully.` });
+  return sendSuccess(res, {
+    message: `Stripe webhook event ${event.id} processed successfully.`,
+  });
 });
