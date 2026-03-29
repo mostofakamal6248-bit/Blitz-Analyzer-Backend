@@ -24,7 +24,7 @@ export async function generateResumePDF(html: string, options = {}) {
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
       ...options,
     });
     return pdfBuffer;
