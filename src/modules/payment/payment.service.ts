@@ -1,12 +1,14 @@
 import { v7 as uuidv7 } from "uuid";
 import { stripe } from "../../config/stripe";
-import { PaymentStatus } from "../../generated/prisma/enums";
+import { PaymentStatus, UserRole } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { uploadPdfBufferToCloudinary } from "../media/media.service";
 import { generatePaymentInvoiceBuffer } from "./payment.utils";
 import { emailQueue } from "../../queue/emailQueue";
 import { envConfig } from "../../config/env";
+import { getProfileCacheKey } from "../auth/auth.service";
+import { redis } from "../../config/redis";
 
 
 const handleStripePaymentSuccess = async (paymentId: string) => {
@@ -26,7 +28,7 @@ const handleStripePaymentSuccess = async (paymentId: string) => {
     const updatedPayment = await tx.payment.update({
       where: { id: paymentId },
       data: { status: PaymentStatus.SUCCESS, updatedAt: new Date() },
-    include: { user: true, plan: true },
+      include: { user: true, plan: true },
 
     });
     const wallet = await tx.creditWallet.upsert({
@@ -37,10 +39,14 @@ const handleStripePaymentSuccess = async (paymentId: string) => {
     return { payment: updatedPayment, wallet };
   });
 
-  const invoiceResult  = await generateAndSendInvoice(result.payment);
-console.log(invoiceResult);
+  const invoiceResult = await generateAndSendInvoice(result.payment);
 
-  return {result,invoiceResult}
+  // reset user cache 
+    const cacheKey = getProfileCacheKey(payment.user.userId, UserRole.USER);
+    await redis.del(cacheKey);
+  console.log(invoiceResult);
+
+  return { result, invoiceResult }
 };
 
 /**
@@ -70,12 +76,12 @@ const generateAndSendInvoice = async (payment: any) => {
   });
 
   // Save invoice URL
-  console.log("in",secure_url);
-  
-  await prisma.payment.update({ where: { id: payment.id }, data: { invoiceUrl: secure_url } });
-    console.log("invoice url save ");
+  console.log("in", secure_url);
 
-    
+  await prisma.payment.update({ where: { id: payment.id }, data: { invoiceUrl: secure_url } });
+  console.log("invoice url save ");
+
+
   await emailQueue.add(
     "payment-success",
     {
@@ -100,7 +106,7 @@ const generateAndSendInvoice = async (payment: any) => {
       jobId: `payment-${payment.id}`, // 🔥 prevents duplicate emails
     }
   );
-console.log("patment success");
+  console.log("patment success");
 
   return { secure_url };
 };
@@ -213,30 +219,30 @@ const getAllTransactions = async (query: any) => {
 }
 
 
-const getPaymentDetails = async(id)=>{
-   const payment = await prisma.payment.findUnique({
-    where:{
-      id:id
+const getPaymentDetails = async (id) => {
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: id
     },
-    include:{plan:true,user:true}
-   })
-   return payment
+    include: { plan: true, user: true }
+  })
+  return payment
 }
-const getUserPaymentHistory = async(id)=>{
+const getUserPaymentHistory = async (id) => {
   console.log(id);
-  
-   const payments = await prisma.payment.findMany({
-    where:{
-      userId:id
+
+  const payments = await prisma.payment.findMany({
+    where: {
+      userId: id
     },
 
-    include:{plan:true,user:true}
-   })
+    include: { plan: true, user: true }
+  })
 
-   return payments
+  return payments
 }
 
-export const paymentServices = { handleStripePaymentSuccess, generateAndSendInvoice, createCreditPurchaseSession,getAllTransactions,getPaymentDetails,getUserPaymentHistory }
+export const paymentServices = { handleStripePaymentSuccess, generateAndSendInvoice, createCreditPurchaseSession, getAllTransactions, getPaymentDetails, getUserPaymentHistory }
 
 
 

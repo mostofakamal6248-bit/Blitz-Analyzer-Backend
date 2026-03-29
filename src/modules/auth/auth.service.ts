@@ -29,7 +29,7 @@ const generateOTP = (length = 6) => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const getProfileCacheKey = (userId: string, role: string) => `profile:${userId}-${role}`;
+export const getProfileCacheKey = (userId: string, role: string) => `profile:${userId}-${role}`;
 
 
 const registerUser = async (payload: IRegisterPayload) => {
