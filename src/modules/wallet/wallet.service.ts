@@ -1,5 +1,8 @@
+import { redis } from "../../config/redis";
+import { UserRole } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
+import { getProfileCacheKey } from "../auth/auth.service";
 
 /**
  * Get user wallet
@@ -89,6 +92,11 @@ const claimFreeCredit = async (id:string)=>{
          isFreeCreditClaim:true
           }
          })
+
+           // reset user cache 
+             const cacheKey = getProfileCacheKey(user.userId, UserRole.USER);
+             await redis.del(cacheKey);
+ 
 
          return updatedUser
 
