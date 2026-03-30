@@ -20,12 +20,12 @@ export const handleStripeWebhookController = asyncHandler(async (req, res) => {
     if (!signature || !endpointSecret) {
       throw new AppError("Missing Stripe signature or webhook secret", status.BAD_REQUEST);
     }
+const payload = (req as any).rawBody || req.body;
+console.log("payload",payload);
 
-    //  raw buffer
-    console.log("Is Buffer:", Buffer.isBuffer(req.body));
 
     event = stripe.webhooks.constructEvent(
-      req.body, //raw body
+      payload,
       signature,
       endpointSecret
     );

@@ -6,7 +6,7 @@ const stripeRouter = Router();
 
 stripeRouter.post(
   "/webhook",
-  bodyParser.raw({ type: "application/json" }),
+  express.raw({ type: "application/json" }),
   handleStripeWebhookController
 );
 
