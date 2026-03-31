@@ -5,6 +5,9 @@ import { AppError } from "../../utils/AppError";
 import { generateCustomResumePDF, generateResumePDF, mergeResume, uploadCustomResumepdf, uploadResume } from "./resume.utils";
 import { cloudinaryInstance } from "../../config/cloudinary.config";
 import streamifier from "streamifier";
+import { getProfileCacheKey } from "../auth/auth.service";
+import { redis } from "../../config/redis";
+import { UserRole } from "../../generated/prisma/enums";
 
 const generateResumeForDownload = async (
    { userId,
@@ -92,6 +95,11 @@ const generateResumeForDownload = async (
          }
       });
    });
+
+   // reset user cache 
+       const cacheKey = getProfileCacheKey(userId, UserRole.USER);
+       await redis.del(cacheKey);
+   
    return {
       resumeUrl: uploadResult.secure_url,
       reused: false
@@ -201,7 +209,10 @@ const generateCustomResumeForDownload = async (htmlContent, userId) => {
          balance: { decrement: 10 }
       }
    });
-   console.log(uploadPDFUrl);
+  
+      // reset user cache 
+       const cacheKey = getProfileCacheKey(userId, UserRole.USER);
+       await redis.del(cacheKey);
    
    return uploadPDFUrl
 }
