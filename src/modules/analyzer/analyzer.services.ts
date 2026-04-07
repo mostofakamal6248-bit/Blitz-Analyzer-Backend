@@ -12,7 +12,7 @@ import {
 import {
   SaveAnalysisPayload,
 } from "./analyzer.interface"
-import { runLLM } from "./analyzer.utils"
+import { analyzeJobMatch, runLLM } from "./analyzer.utils"
 import { AppError } from "../../utils/AppError"
 import status from "http-status"
 import { generateReport } from "../../utils/analysis"
@@ -43,8 +43,15 @@ const resumeATSScan = async (resumeText: string,id:string) => {
     id,
     ...result
   }
-}
+};
 
+const jobMatcher = async (resumeText,jobData) =>{
+console.log("sr",jobData);
+
+  const result = await analyzeJobMatch(resumeText,JSON.parse(jobData));
+  return result
+}
+ 
 
 
 
@@ -351,5 +358,6 @@ export const analyzerServices = {
   makeAtsFriendly,
   getAllAnalysis,
   deleteAnalysis,
-  generateReportHandler
+  generateReportHandler,
+  jobMatcher
 };

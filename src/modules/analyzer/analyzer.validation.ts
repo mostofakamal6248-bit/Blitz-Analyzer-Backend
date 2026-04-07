@@ -4,7 +4,7 @@ import { z } from "zod";
 // Parse Resume Validation
 
 export const parseResumeSchema = z.object({
-  analysisType: z.enum(["ATS_SCAN"], {
+  analysisType: z.enum(["ATS_SCAN","JOB_MATCHER"], {
     required_error: "analysisType is required",
   })
 });

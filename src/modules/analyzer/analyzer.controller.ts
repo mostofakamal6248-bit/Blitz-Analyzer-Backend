@@ -15,6 +15,7 @@ import { prisma } from "../../lib/prisma";
 
 const parseResumeController = asyncHandler(async (req: Request, res: Response) => {
 
+
   if (!req.file) {
     return sendError(res, {
       message: "Resume file is required",
@@ -22,7 +23,7 @@ const parseResumeController = asyncHandler(async (req: Request, res: Response) =
     });
   }
 
-  const { analysisType } = req.body;
+  const { analysisType,jobData } = req.body;
 
 
   if (!analysisType) {
@@ -36,12 +37,14 @@ const parseResumeController = asyncHandler(async (req: Request, res: Response) =
   const parseText = await analyzerServices.parseResumeService(req.file.buffer);
 
   const analysisId = uuidv7();
+console.log(req.body);
 
 
   const parseDoc = {
     id: analysisId,
     parseText,
     analysisType,
+    jobData:analysisType === AnalysisType.JOB_MATCHER ? jobData : null,
     resumeFile: {
       filename: req.file.originalname,
       mimetype: req.file.mimetype,
@@ -66,8 +69,6 @@ const parseResumeController = asyncHandler(async (req: Request, res: Response) =
     statusCode: status.CREATED
   });
 });
-
-
 
 // 2️⃣ Complete AI Analysis
 
@@ -108,13 +109,17 @@ const completeAnalysesResumeResult = asyncHandler(async (req: Request, res: Resp
       statusCode: status.NOT_FOUND
     });
   }
+console.log("cache data",JSON.stringify(cacheData));
 
-  const { parseText, analysisType } = JSON.parse(cacheData);
+  const { parseText, analysisType,jobData } = JSON.parse(cacheData);
 
   let result;
 
   if (analysisType === AnalysisType.ATS_SCAN) {
     result = await analyzerServices.resumeATSScan(parseText,id as string);
+  }
+  else if (analysisType === AnalysisType.JOB_MATCHER) {
+    result = await analyzerServices.jobMatcher(parseText,jobData);
   }
 
   // cache AI result
@@ -124,6 +129,8 @@ const completeAnalysesResumeResult = asyncHandler(async (req: Request, res: Resp
     "EX",
     600
   );
+  console.log("r",result);
+  
   return sendSuccess(res, {
     message: "Resume analysis completed",
     data: result
@@ -283,14 +290,37 @@ const generateAnalysisReport = asyncHandler(async(req,res)=>{
   })
 })
 
+
+const jobMatcherController = asyncHandler(async(req,res)=>{
+  if (!req.file) {
+    return sendError(res, {
+      message: "Resume file is required",
+      statusCode: status.BAD_REQUEST
+    });
+  }
+  const parseText = await analyzerServices.parseResumeService(req.file.buffer);
+ 
+  
+  const {jobData} =  req.body;
+  console.log("data",jobData);
+  console.log(req.body);
+  
+  
+  const result = await analyzerServices.jobMatcher(parseText,jobData);
+ return sendSuccess(res,{
+    data:result,
+    message:"Your job matching report ready"
+  })
+})
+
 export const analyzerControllers = {
   parseResumeController,
   completeAnalysesResumeResult,
   saveAnalysisController,
   makeAtsFriendlyController,
   applyImprovementController,
-
   getAllAnalysisHistory,
   deleteAnalysis,
-  generateAnalysisReport
+  generateAnalysisReport,
+  jobMatcherController
 };

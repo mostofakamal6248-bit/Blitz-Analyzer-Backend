@@ -25,6 +25,13 @@ analyzerRouter.post(
   validateRequest(parseResumeSchema),
   analyzerControllers.parseResumeController
 );
+analyzerRouter.post(
+  "/job-matcher",
+  authMiddleware,
+    roleMiddleware(["USER"]),
+  upload.single("resume"),
+  analyzerControllers.jobMatcherController
+);
 
 
 analyzerRouter.post(
