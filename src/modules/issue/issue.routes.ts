@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { issueController } from "./issue.controller";
-import validateRequest from "../../middlewares/validateRequest";
+import { validateRequest } from "../../middleware/validateRequest";
 import {
   createIssueSchema,
   getIssuesQuerySchema,
@@ -18,26 +18,26 @@ router.post(
 
 router.get(
   "/",
-  validateRequest(getIssuesQuerySchema, "query"),
+  validateRequest(getIssuesQuerySchema),
   issueController.getAllIssuesController
 );
 
 router.get(
   "/:issueId",
-  validateRequest(issueIdParamsSchema, "params"),
+  validateRequest(issueIdParamsSchema),
   issueController.getIssueByIdController
 );
 
 router.patch(
   "/:issueId",
-  validateRequest(issueIdParamsSchema, "params"),
+  validateRequest(issueIdParamsSchema ),
   validateRequest(updateIssueSchema),
   issueController.updateIssueController
 );
 
 router.delete(
   "/:issueId",
-  validateRequest(issueIdParamsSchema, "params"),
+  validateRequest(issueIdParamsSchema),
   issueController.deleteIssueController
 );
 
