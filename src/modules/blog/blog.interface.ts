@@ -3,7 +3,9 @@ import { BlogStatus } from "../../generated/prisma/enums";
 
 export interface ICreateBlogPayload {
   title: string;
+  slug: string;
   excerpt?: string | null;
+  thumbnail?: string;
   fullContent: string;
   seoTags?: any;
   category?: string | null;
@@ -23,12 +25,12 @@ export interface IUpdateBlogPayload {
 }
 
 export interface IGetBlogsQuery {
-  page?: number;
-  limit?: number;
-  search?: string;
-  status?: BlogStatus;
-  category?: string;
-  authorId?: string;
+  page: number;
+  limit: number;
+  search?: string | undefined; // ⚠ important
+  status?: BlogStatus | undefined;
+  category?: string | undefined;
+  authorId?: string | undefined;
 }
 
 export interface IPaginationMeta {

@@ -53,6 +53,23 @@ export const auth = betterAuth({
         requireEmailVerification: false,
 
     },
+  socialProviders:{
+          google:{
+              clientId: envConfig.GOOGLE_CLIENT_ID,
+              clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
+              // callbackUrl: envVars.GOOGLE_CALLBACK_URL,
+              mapProfileToUser: ()=>{
+                  return {
+                      role : UserRole.USER,
+                      status : UserStatus.ACTIVE,
+                      needPasswordChange : false,
+                      emailVerified : true,
+                      isDeleted : false,
+                      deletedAt : null,
+                  }
+              }
+          }
+      },
 
     advanced: {
         defaultCookieAttributes: {

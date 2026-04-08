@@ -9,8 +9,7 @@ export const createBlogSchema = z.object({
   seoTags: z.any().optional(),
   category: z.string().optional().nullable(),
   status: blogStatusEnum.optional(),
-  publishedAt: z.coerce.date().optional().nullable(),
-  authorId: z.string().min(1),
+  thumbnail: blogStatusEnum.optional(),
 });
 
 export const updateBlogSchema = z

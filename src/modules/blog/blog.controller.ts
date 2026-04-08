@@ -3,10 +3,12 @@ import { Request, Response } from "express";
 import { blogServices } from "./blog.services";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { sendSuccess } from "../../utils/apiResponse";
+import { BlogStatus } from "../../generated/prisma/enums";
 
 const createBlog = asyncHandler(async (req: Request, res: Response) => {
-  const result = await blogServices.createBlog(req.body);
-
+    console.log(req.body);
+    
+  const result = await blogServices.createBlog({...req.body,authorId:res.locals.user.id});
   return sendSuccess(res, {
     statusCode: 201,
     data: result,
@@ -39,7 +41,16 @@ const deleteBlog = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getAllBlogs = asyncHandler(async (req: Request, res: Response) => {
-  const result = await blogServices.getAllBlogs(req.query as any);
+  const { page, limit, search, status, category, authorId } = req.query;
+
+const result = await blogServices.getAllBlogs({
+  page: Number(req.query.page) || 1,
+  limit: Number(req.query.limit) || 10,
+  search: req.query.search ? String(req.query.search) : undefined,
+  status: req.query.status ? (req.query.status as BlogStatus) : undefined,
+  category: req.query.category ? String(req.query.category) : undefined,
+  authorId: req.query.authorId ? String(req.query.authorId) : undefined,
+});
 
   return sendSuccess(res, {
     statusCode: 200,

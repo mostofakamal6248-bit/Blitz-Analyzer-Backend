@@ -73,4 +73,8 @@ router.put(
   authControllers.updateProfileInfo
 );
 
+router.get("/login/google", authControllers.googleLogin); // when git request when a google account selct page
+router.get("/google/success", authControllers.googleLoginSuccess);
+router.get("/oauth/error", authControllers.handleOAuthError);
+
 export default router;

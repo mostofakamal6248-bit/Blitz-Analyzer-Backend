@@ -187,6 +187,7 @@ export const BlogScalarFieldEnum = {
   id: 'id',
   title: 'title',
   slug: 'slug',
+  thumbnail: 'thumbnail',
   excerpt: 'excerpt',
   fullContent: 'fullContent',
   seoTags: 'seoTags',

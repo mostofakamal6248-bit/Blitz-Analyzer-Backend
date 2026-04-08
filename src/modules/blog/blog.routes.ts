@@ -15,7 +15,8 @@ router.post("/",
     
     authMiddleware,
     roleMiddleware(["MANAGER"]),
-    validateRequest(createBlogSchema), blogController.createBlog);
+    // validateRequest(createBlogSchema)
+     blogController.createBlog);
 
 router.get("/", validateRequest(getBlogsQuerySchema,), blogController.getAllBlogs);
 

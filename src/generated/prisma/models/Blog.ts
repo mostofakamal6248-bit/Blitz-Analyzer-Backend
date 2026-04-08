@@ -28,6 +28,7 @@ export type BlogMinAggregateOutputType = {
   id: string | null
   title: string | null
   slug: string | null
+  thumbnail: string | null
   excerpt: string | null
   fullContent: string | null
   category: string | null
@@ -42,6 +43,7 @@ export type BlogMaxAggregateOutputType = {
   id: string | null
   title: string | null
   slug: string | null
+  thumbnail: string | null
   excerpt: string | null
   fullContent: string | null
   category: string | null
@@ -56,6 +58,7 @@ export type BlogCountAggregateOutputType = {
   id: number
   title: number
   slug: number
+  thumbnail: number
   excerpt: number
   fullContent: number
   seoTags: number
@@ -73,6 +76,7 @@ export type BlogMinAggregateInputType = {
   id?: true
   title?: true
   slug?: true
+  thumbnail?: true
   excerpt?: true
   fullContent?: true
   category?: true
@@ -87,6 +91,7 @@ export type BlogMaxAggregateInputType = {
   id?: true
   title?: true
   slug?: true
+  thumbnail?: true
   excerpt?: true
   fullContent?: true
   category?: true
@@ -101,6 +106,7 @@ export type BlogCountAggregateInputType = {
   id?: true
   title?: true
   slug?: true
+  thumbnail?: true
   excerpt?: true
   fullContent?: true
   seoTags?: true
@@ -189,6 +195,7 @@ export type BlogGroupByOutputType = {
   id: string
   title: string
   slug: string
+  thumbnail: string | null
   excerpt: string | null
   fullContent: string
   seoTags: runtime.JsonValue | null
@@ -225,6 +232,7 @@ export type BlogWhereInput = {
   id?: Prisma.StringFilter<"Blog"> | string
   title?: Prisma.StringFilter<"Blog"> | string
   slug?: Prisma.StringFilter<"Blog"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Blog"> | string | null
   excerpt?: Prisma.StringNullableFilter<"Blog"> | string | null
   fullContent?: Prisma.StringFilter<"Blog"> | string
   seoTags?: Prisma.JsonNullableFilter<"Blog">
@@ -242,6 +250,7 @@ export type BlogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   excerpt?: Prisma.SortOrderInput | Prisma.SortOrder
   fullContent?: Prisma.SortOrder
   seoTags?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -262,6 +271,7 @@ export type BlogWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.BlogWhereInput[]
   NOT?: Prisma.BlogWhereInput | Prisma.BlogWhereInput[]
   title?: Prisma.StringFilter<"Blog"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Blog"> | string | null
   excerpt?: Prisma.StringNullableFilter<"Blog"> | string | null
   fullContent?: Prisma.StringFilter<"Blog"> | string
   seoTags?: Prisma.JsonNullableFilter<"Blog">
@@ -279,6 +289,7 @@ export type BlogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   excerpt?: Prisma.SortOrderInput | Prisma.SortOrder
   fullContent?: Prisma.SortOrder
   seoTags?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -300,6 +311,7 @@ export type BlogScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Blog"> | string
   title?: Prisma.StringWithAggregatesFilter<"Blog"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Blog"> | string
+  thumbnail?: Prisma.StringNullableWithAggregatesFilter<"Blog"> | string | null
   excerpt?: Prisma.StringNullableWithAggregatesFilter<"Blog"> | string | null
   fullContent?: Prisma.StringWithAggregatesFilter<"Blog"> | string
   seoTags?: Prisma.JsonNullableWithAggregatesFilter<"Blog">
@@ -315,6 +327,7 @@ export type BlogCreateInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -331,6 +344,7 @@ export type BlogUncheckedCreateInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -347,6 +361,7 @@ export type BlogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -363,6 +378,7 @@ export type BlogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -379,6 +395,7 @@ export type BlogCreateManyInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -394,6 +411,7 @@ export type BlogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -408,6 +426,7 @@ export type BlogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -423,6 +442,7 @@ export type BlogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   fullContent?: Prisma.SortOrder
   seoTags?: Prisma.SortOrder
@@ -438,6 +458,7 @@ export type BlogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   fullContent?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -452,6 +473,7 @@ export type BlogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
   excerpt?: Prisma.SortOrder
   fullContent?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -541,6 +563,7 @@ export type BlogCreateWithoutCommentsInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -556,6 +579,7 @@ export type BlogUncheckedCreateWithoutCommentsInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -587,6 +611,7 @@ export type BlogUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -602,6 +627,7 @@ export type BlogUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -617,6 +643,7 @@ export type BlogCreateWithoutAuthorInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -632,6 +659,7 @@ export type BlogUncheckedCreateWithoutAuthorInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -676,6 +704,7 @@ export type BlogScalarWhereInput = {
   id?: Prisma.StringFilter<"Blog"> | string
   title?: Prisma.StringFilter<"Blog"> | string
   slug?: Prisma.StringFilter<"Blog"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Blog"> | string | null
   excerpt?: Prisma.StringNullableFilter<"Blog"> | string | null
   fullContent?: Prisma.StringFilter<"Blog"> | string
   seoTags?: Prisma.JsonNullableFilter<"Blog">
@@ -691,6 +720,7 @@ export type BlogCreateManyAuthorInput = {
   id?: string
   title: string
   slug: string
+  thumbnail?: string | null
   excerpt?: string | null
   fullContent: string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -705,6 +735,7 @@ export type BlogUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -720,6 +751,7 @@ export type BlogUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -735,6 +767,7 @@ export type BlogUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullContent?: Prisma.StringFieldUpdateOperationsInput | string
   seoTags?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -780,6 +813,7 @@ export type BlogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   title?: boolean
   slug?: boolean
+  thumbnail?: boolean
   excerpt?: boolean
   fullContent?: boolean
   seoTags?: boolean
@@ -798,6 +832,7 @@ export type BlogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   title?: boolean
   slug?: boolean
+  thumbnail?: boolean
   excerpt?: boolean
   fullContent?: boolean
   seoTags?: boolean
@@ -814,6 +849,7 @@ export type BlogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   title?: boolean
   slug?: boolean
+  thumbnail?: boolean
   excerpt?: boolean
   fullContent?: boolean
   seoTags?: boolean
@@ -830,6 +866,7 @@ export type BlogSelectScalar = {
   id?: boolean
   title?: boolean
   slug?: boolean
+  thumbnail?: boolean
   excerpt?: boolean
   fullContent?: boolean
   seoTags?: boolean
@@ -841,7 +878,7 @@ export type BlogSelectScalar = {
   authorId?: boolean
 }
 
-export type BlogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "excerpt" | "fullContent" | "seoTags" | "category" | "status" | "createdAt" | "updatedAt" | "publishedAt" | "authorId", ExtArgs["result"]["blog"]>
+export type BlogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "thumbnail" | "excerpt" | "fullContent" | "seoTags" | "category" | "status" | "createdAt" | "updatedAt" | "publishedAt" | "authorId", ExtArgs["result"]["blog"]>
 export type BlogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   comments?: boolean | Prisma.Blog$commentsArgs<ExtArgs>
   author?: boolean | Prisma.ManagerDefaultArgs<ExtArgs>
@@ -864,6 +901,7 @@ export type $BlogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     title: string
     slug: string
+    thumbnail: string | null
     excerpt: string | null
     fullContent: string
     seoTags: runtime.JsonValue | null
@@ -1301,6 +1339,7 @@ export interface BlogFieldRefs {
   readonly id: Prisma.FieldRef<"Blog", 'String'>
   readonly title: Prisma.FieldRef<"Blog", 'String'>
   readonly slug: Prisma.FieldRef<"Blog", 'String'>
+  readonly thumbnail: Prisma.FieldRef<"Blog", 'String'>
   readonly excerpt: Prisma.FieldRef<"Blog", 'String'>
   readonly fullContent: Prisma.FieldRef<"Blog", 'String'>
   readonly seoTags: Prisma.FieldRef<"Blog", 'Json'>

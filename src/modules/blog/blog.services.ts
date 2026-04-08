@@ -43,15 +43,17 @@ const invalidateBlogCache = async (id?: string) => {
 
 const createBlog = async (payload: ICreateBlogPayload) => {
   try {
-    const slug = await generateSlug(payload.title);
-
+    console.log("payload",payload);
+    
+ 
     const blog = await prisma.blog.create({
       data: {
-        ...payload,
-        slug,
+        title:payload.title,
+        slug:payload.slug,
         status: payload.status ?? BlogStatus.DRAFT,
-        publishedAt:
-          payload.status === "PUBLISHED" ? new Date() : null,
+        thumbnail:payload.thumbnail! || "",
+        fullContent:payload.fullContent,
+        authorId:payload.authorId
       },
     });
 
@@ -110,34 +112,23 @@ const deleteBlog = async (blogId: string) => {
 const getAllBlogs = async (query: IGetBlogsQuery) => {
   const cacheKey = buildListCacheKey(query);
 
-  const cached = await redis.get(cacheKey);
-  if (cached) return JSON.parse(cached);
+//   const cached = await redis.get(cacheKey);
+//   if (cached) return JSON.parse(cached);
 
   const { page = 1, limit = 10, search, status, category, authorId } = query;
 
   const skip = (page - 1) * limit;
+const filters: Prisma.BlogWhereInput[] = [];
 
-  const where: Prisma.BlogWhereInput = {
-    AND: [
-      status ? { status } : {},
-      category ? { category } : {},
-      authorId ? { authorId } : {},
-      search
-        ? {
-            OR: [
-              { title: { contains: search, mode: "insensitive" } },
-              { fullContent: { contains: search, mode: "insensitive" } },
-              { excerpt: { contains: search, mode: "insensitive" } },
-            ],
-          }
-        : {},
-    ],
-  };
+if (query.status) filters.push({ status: query.status });
+if (query.category) filters.push({ category: query.category });
 
-  const [total, blogs] = await Promise.all([
-    prisma.blog.count({ where }),
+const where: Prisma.BlogWhereInput = filters.length > 0 ? { AND: filters } : {};
+
+  const  [total,blogs] = await Promise.all([
+    prisma.blog.count(),
     prisma.blog.findMany({
-      where,
+        where,
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
@@ -153,12 +144,12 @@ const getAllBlogs = async (query: IGetBlogsQuery) => {
     meta: {
       page,
       limit,
-      total,
-      totalPages: Math.ceil(total / limit),
+    total:total,
+      totalPages: Math.ceil(blogs.length / limit),
     },
   };
 
-  await redis.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
+//   await redis.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
 
   return result;
 };

@@ -3,6 +3,7 @@ model Blog {
   id              String    @id @default(uuid())
   title           String
   slug            String    @unique
+  thumbnail            String?    
   excerpt         String?   @db.Text
   fullContent     String    @db.VarChar(10000) 
   seoTags         Json?    

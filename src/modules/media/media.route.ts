@@ -6,7 +6,7 @@ import { sendSuccess } from "../../utils/apiResponse";
 const mediaRouter = Router();
 
 
-mediaRouter.post("/upload-avatar",authMiddleware,roleMiddleware(["ADMIN","USER"]), multerUploader.fields([
+mediaRouter.post("/upload-avatar",authMiddleware,roleMiddleware(["ADMIN","USER","MANAGER"]), multerUploader.fields([
     { name: "avatar", maxCount: 1 }
 ]), (req, res) => {
     // req.files holo ekta object jar moddhe array thake

@@ -41,9 +41,11 @@ const registerUser = async (payload: IRegisterPayload) => {
         email: payload.email,
         name: payload.name,
         password: payload.password,
-        role: UserRole.USER
+        role: payload.role !== "ADMIN" ? payload.role : "ADMIN"
       }
     });
+
+    
 
     // 2️⃣ Create profile (DB only)
     await prisma.customerProfile.create({
@@ -63,7 +65,54 @@ const registerUser = async (payload: IRegisterPayload) => {
     });
     return { user };
   } catch (error: any) {
-     if (
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new AppError("Email already exists", 409);
+    }
+
+    // Auth provider duplicate error
+    if (
+      error?.message?.toLowerCase().includes("already") ||
+      error?.message?.toLowerCase().includes("exists")
+    ) {
+      throw new AppError("Email already registered", 409);
+    }
+
+    // ❌ fallback
+    throw new AppError(
+      error?.message || "Registration failed",
+      error?.statusCode || 500
+    );
+  }
+};
+const registerManager = async (payload: IRegisterPayload) => {
+  try {
+    // 1️⃣ Create user
+    const { user } = await auth.api.signUpEmail({
+      body: {
+        email: payload.email,
+        name: payload.name,
+        password: payload.password,
+        role: payload.role !== "ADMIN" ? payload.role : "ADMIN"
+      }
+    });
+
+
+
+    // 2️⃣ Create profile (DB only)
+    await prisma.manager.create({
+      data: {
+        email: user.email,
+        name: user.name,
+        userId: user.id
+      }
+    });
+
+    return { user };
+  } catch (error: any) {
+    if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
@@ -96,7 +145,7 @@ const loginUser = async (payload: ILoginUserPayload) => {
     throw new AppError("Too many login attempts", 429);
 
   const data = await auth.api.signInEmail({ body: { email, password } });
-console.log(data);
+  console.log(data);
 
   if (data.user.status === UserStatus.BANNED)
     throw new AppError("User is blocked", status.FORBIDDEN);
@@ -195,8 +244,10 @@ const getAllNewTokens = async (
 
 };
 
+
+
 const getCustomerProfile = async (user: IRequestUser) => {
-  const cacheKey = getProfileCacheKey(user.userId,user.role)
+  const cacheKey = getProfileCacheKey(user.userId, user.role)
 
   const cached = await redis.get(cacheKey);
   if (cached) return JSON.parse(cached);
@@ -204,7 +255,7 @@ const getCustomerProfile = async (user: IRequestUser) => {
     where: {
       id: user.userId
     },
-    include: { admin: true, customerProfile: true }
+    include: { admin: true, customerProfile: true ,manager:true}
   });
 
   if (baseUser?.role === UserRole.ADMIN) {
@@ -225,6 +276,24 @@ const getCustomerProfile = async (user: IRequestUser) => {
     );
     console.log("Customer logged in");
     return admin;
+  } else if(baseUser?.role === UserRole.MANAGER){
+     const manager = await prisma.manager.findUnique({
+      where: { id: baseUser?.manager?.id! }, include: {
+        user: true,
+      }
+    });
+
+    if (!manager)
+      throw new AppError("User not found", status.NOT_FOUND);
+
+    await redis.set(
+      cacheKey,
+      JSON.stringify(manager),
+      "EX",
+      PROFILE_CACHE_EXPIRE
+    );
+    console.log("Customer logged in");
+    return manager;
   } else {
     const customerProfile = await prisma.customerProfile.findUnique({
       where: { id: baseUser?.customerProfile?.id! }, include: {
@@ -260,23 +329,25 @@ const logoutUser = async (
 const changePassword = async (payload: IChangePassword) => {
 
 
- 
+
   const session = await prisma.session.findUnique({
-    where:{
-      token:payload.sessionToken
+    where: {
+      token: payload.sessionToken
     },
-    include:{user:{
-      include:{
-        accounts:true
+    include: {
+      user: {
+        include: {
+          accounts: true
+        }
       }
-    }}
+    }
   });
 
   const userAccount = session?.user.accounts.filter((ac) => ac.userId === session.user.id)[0];
 
 
 
-if (payload.currentPassword === payload.newPassword) {
+  if (payload.currentPassword === payload.newPassword) {
     throw new AppError("New password cannot be the same as the current password", 400);
   }
 
@@ -289,7 +360,7 @@ if (payload.currentPassword === payload.newPassword) {
       newPassword: payload.newPassword,
     },
   });
-console.log(updatedUser);
+  console.log(updatedUser);
 
   return updatedUser;
 };
@@ -319,22 +390,22 @@ const resetPassword = async (
   return true;
 };
 
-const verifyEmail = async (payload:{
+const verifyEmail = async (payload: {
   email: string;
   otp: string;
 }) => {
- try {
+  try {
     const { email, otp } = payload;
 
     // 1️⃣ Find verification record
     const record = await prisma.verification.findFirst({
       where: {
         identifier: email,
-        value:otp,
+        value: otp,
         type: VerificationType.EMAIL_VERIFY
       },
       orderBy: {
-        createdAt: "desc" 
+        createdAt: "desc"
       }
     });
 
@@ -343,14 +414,14 @@ const verifyEmail = async (payload:{
     }
 
     if (record.expiresAt < new Date()) {
- 
+
       await prisma.verification.delete({ where: { id: record.id } });
       throw new AppError("OTP expired", 400);
     }
 
 
- 
-    if (otp !== record.value) {  
+
+    if (otp !== record.value) {
 
       throw new AppError("Invalid OTP", 400);
     }
@@ -463,7 +534,7 @@ const changeAvatar = async (profileAvatarUrl: string, userId: string) => {
   // 🔥 CRITICAL FIX: Invalidate Cache
   const cacheKey = getProfileCacheKey(userId, result.role);
   await redis.del(cacheKey);
-console.log("avater chnages");
+  console.log("avater chnages");
 
   return result;
 };
@@ -473,11 +544,11 @@ console.log("avater chnages");
 
 
 
- const sendOtp = async (payload:{
+const sendOtp = async (payload: {
   email: string;
   name: string;
   type: VerificationType;
-  expiration?: number; 
+  expiration?: number;
 }) => {
   const { email, name, type, expiration = 5 } = payload;
 
@@ -486,8 +557,8 @@ console.log("avater chnages");
     const otp = generateOTP();
     const tokenHash = await hashOTP(otp);
     const expiresAt = getExpiry(expiration);
-   const isMatch = await bcrypt.compare(otp, tokenHash);
-console.log(isMatch,otp,tokenHash);
+    const isMatch = await bcrypt.compare(otp, tokenHash);
+    console.log(isMatch, otp, tokenHash);
     // 2️⃣ DB operations (fast transaction)
     await prisma.$transaction(async (tx) => {
       await tx.verification.deleteMany({
@@ -500,7 +571,7 @@ console.log(isMatch,otp,tokenHash);
       await tx.verification.create({
         data: {
           identifier: email,
-          value:otp, 
+          value: otp,
           type,
           expiresAt
         }
@@ -525,7 +596,7 @@ console.log(isMatch,otp,tokenHash);
 };
 
 
- const resendOtp = async (email: string, type: VerificationType = VerificationType.EMAIL_VERIFY) => {
+const resendOtp = async (email: string, type: VerificationType = VerificationType.EMAIL_VERIFY) => {
   // 1️⃣ Check user exists
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new AppError("User not found", 404);
@@ -551,6 +622,52 @@ console.log(isMatch,otp,tokenHash);
   return true
 };
 
+const googleLoginSuccess = async (
+  session: Record<string, any>
+) => {
+  const existingPatient = await prisma.customerProfile.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  if (!existingPatient) {
+    await prisma.customerProfile.create({
+      data: {
+        userId: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+      },
+    });
+  }
+
+  const tokenPayload = {
+    userId: session.user.id,
+    role: session.user.role,
+    name: session.user.name,
+    email: session.user.email,
+  };
+
+  const accessToken = tokenUtils.getAccessToken(tokenPayload);
+  const refreshToken = tokenUtils.getRefreshToken(tokenPayload);
+  const sessionToken = crypto.randomUUID();
+
+  await redis.set(
+    `session:${sessionToken}`,
+    JSON.stringify(tokenPayload),
+    "EX",
+    SESSION_EXPIRE
+  );
+
+  await redis.set(
+    `refresh:${refreshToken}`,
+    sessionToken,
+    "EX",
+    REFRESH_EXPIRE
+  );
+
+  return { accessToken, refreshToken, sessionToken };
+};
+
+
 export const authServices = {
   registerUser,
   loginUser,
@@ -563,5 +680,6 @@ export const authServices = {
   verifyEmail,
   changeAvatar,
   updateProfile,
-  resendOtp
+  resendOtp,registerManager,
+  googleLoginSuccess
 };

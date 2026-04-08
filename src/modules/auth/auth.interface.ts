@@ -1,9 +1,11 @@
+import { UserRole } from "../../generated/prisma/enums";
+
 export interface IRegisterPayload  {
   name: string;
   email: string;
   contactNumber: string;
   password: string;
-  role?: "DOCTOR" | "PATIENT"; // optional, default = STUDENT
+  role?:UserRole // optional, default = STUDENT
 };
 
 export interface ILoginUserPayload  {

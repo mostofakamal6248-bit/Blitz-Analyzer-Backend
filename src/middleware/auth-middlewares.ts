@@ -30,7 +30,7 @@ export async function authMiddleware(
       },
       
       include: { user: {
-        include:{customerProfile:true,admin:true}
+        include:{customerProfile:true,admin:true,manager:true}
       } }
     });
     // console.log("session data",sessionData);
@@ -46,6 +46,7 @@ export async function authMiddleware(
 
     const { user } = sessionData;
 
+console.log(user);
 
     if (user.status === "BANNED" || user.status === "DELETED" || user.isDeleted) {
       return sendError(res, {
@@ -72,7 +73,7 @@ export async function authMiddleware(
       role: user.role,
       email: user.email,
     };
-    res.locals.user = user.role === UserRole.USER ? user.customerProfile as CustomerProfile : user.admin as any
+    res.locals.user = user.role === UserRole.USER ? user.customerProfile as CustomerProfile :  user.role === UserRole.MANAGER ?  user.manager : user.admin as any
 
     return next();
   } catch (error) {
